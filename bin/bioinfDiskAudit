@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "optparse"
+
+require "diskAudit"
+require "diskAudit/auditData"
+
+auditor = DiskAudit::DiskAudit.new
+data = DiskAudit::AuditData.new
+
+ARGV.each do |arg|
+  puts "Processing '#{arg}'..."
+  auditor.audit(arg,data)
+end
+
+data.report(STDOUT)
+
+dir = Gem.datadir("diskAudit")
+path = File.join(dir,"thing.html.erb")
+File.open(path) do |fd|
+  data = fd.read()
+  STDOUT.write(data)
+end
