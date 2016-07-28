@@ -1,3 +1,6 @@
+require "ostruct"
+
+require "diskAudit/version"
 require "diskAudit/friendlyNumbers"
 
 module DiskAudit
@@ -21,7 +24,8 @@ module DiskAudit
       @store[s.uid] = @store.fetch(s.uid,0) + s.size
     end
 
-    def report(fd)
+    def report(outFD)
+      @rdata = []
       @store.each do |x,y|
         begin
           n = Etc.getpwuid(x).name
@@ -32,10 +36,22 @@ module DiskAudit
             n = "#{x}"
           end
         end
-        friendly_y = FriendlyNumbers.commify(y)
+        comma_y = FriendlyNumbers.commify(y)
         units_y = FriendlyNumbers.addUnits(y)
-        fd.write("#{n}: #{units_y} (#{friendly_y})\n")
+        row = OpenStruct.new
+        row.name = n
+        row.friendly = "%f %s" % [units_y[0],units_y[1]]
+        row.raw = comma_y
+        @rdata << row
       end
+
+      path = File.join(Gem.datadir(PACKAGE),"report.txt.erb")
+      fd = File.open(path)
+      template = fd.read
+      fd.close
+      renderer = ERB.new(template)
+      outFD.write(renderer.result(binding))
+      
     end
 
   end

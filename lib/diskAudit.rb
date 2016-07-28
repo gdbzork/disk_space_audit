@@ -1,4 +1,5 @@
 require "find"
+require "diskAudit/auditData"
 require "diskAudit/version"
 
 # Audits a path or paths on disk, reporting disk usage by user.
@@ -20,6 +21,21 @@ module DiskAudit
           puts "Visiting '#{p}'..."
         end
       end
+    end
+
+    def dump_dirs(paths)
+    end
+
+    def execute_remote(paths)
+    end
+
+    def report(paths)
+      data = AuditData.new
+      paths.each do |arg|
+        puts "Processing '#{arg}'..."
+        audit(arg,data)
+      end
+      data.report(STDOUT)
     end
 
   end

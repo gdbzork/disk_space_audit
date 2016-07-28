@@ -2,23 +2,39 @@
 
 require "bundler/setup"
 require "optparse"
+require "logger"
 
 require "diskAudit"
-require "diskAudit/auditData"
+
+options = {}
+
+def setupOptions()
+  parser = OptionParser.new do |o|
+    o.on('-v','generate verbose output') { |k| options[:verbose] = true }
+  end
+  return parser
+end
+
+$log = Logger.new(STDERR)
+setupOptions.parse!
+cmd = ARGV[0]
 
 auditor = DiskAudit::DiskAudit.new
-data = DiskAudit::AuditData.new
-
-ARGV.each do |arg|
-  puts "Processing '#{arg}'..."
-  auditor.audit(arg,data)
+case cmd
+  when "dump"
+    auditor.dump_dirs(ARGV[1..-1])
+  when "remote"
+    auditor.execute_remote(ARGV[1..-1])
+  when "report"
+    auditor.report(ARGV[1..-1])
+  else
+    $log.error("Unknown command '#{cmd}'")
 end
 
-data.report(STDOUT)
 
-dir = Gem.datadir("diskAudit")
-path = File.join(dir,"thing.html.erb")
-File.open(path) do |fd|
-  data = fd.read()
-  STDOUT.write(data)
-end
+#dir = Gem.datadir("diskAudit")
+#path = File.join(dir,"thing.html.erb")
+#File.open(path) do |fd|
+#  data = fd.read()
+#  STDOUT.write(data)
+#end

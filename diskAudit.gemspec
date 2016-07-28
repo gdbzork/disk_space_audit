@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'diskAudit/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "diskAudit"
+  spec.name          = DiskAudit::PACKAGE
   spec.version       = DiskAudit::VERSION
   spec.authors       = ["Gord Brown"]
   spec.email         = ["gordon.brown@cruk.cam.ac.uk"]

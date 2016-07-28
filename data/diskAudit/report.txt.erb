@@ -1,0 +1,4 @@
+^ User ^ Disk Space (friendly) ^ Disk Space (raw) ^
+<% @rdata.each do |row| %>
+  | <%= row.name %> | <%= row.friendly %> | <%= row.raw %> |
+<% end %>
