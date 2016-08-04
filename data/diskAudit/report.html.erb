@@ -1,0 +1,9 @@
+
+<table>
+  <thead>
+    <th>User</th><th>Disk Space (friendly)</th><th>Disk Space (bytes)</th>
+  </thead>
+  <% @rdata.each do |row| %>
+    <tr><td><%= row.name %></td><td><%= row.friendly %></td><td><%= row.comma %>a</td></tr>
+  <% end %>
+</table>

@@ -6,6 +6,8 @@ require "logger"
 
 require "diskAudit"
 
+LOGFILE = "/var/log/diskAudit/diskAudit.log"
+
 options = {}
 
 def setupOptions()
@@ -15,14 +17,16 @@ def setupOptions()
   return parser
 end
 
-$log = Logger.new(STDERR)
+$log = Logger.new(File.open(LOGFILE,mode="a"))
+$log.level = Logger::DEBUG
+
 setupOptions.parse!
 cmd = ARGV[0]
 
 auditor = DiskAudit::DiskAudit.new
 case cmd
   when "dump"
-    auditor.dump_dirs(ARGV[1..-1])
+    auditor.dump_dir(ARGV[1])
   when "remote"
     auditor.execute_remote(ARGV[1..-1])
   when "report"

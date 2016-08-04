@@ -1,4 +1,5 @@
 require "ostruct"
+require "erb"
 
 require "diskAudit/version"
 require "diskAudit/friendlyNumbers"
@@ -40,16 +41,19 @@ module DiskAudit
         units_y = FriendlyNumbers.addUnits(y)
         row = OpenStruct.new
         row.name = n
-        row.friendly = "%f %s" % [units_y[0],units_y[1]]
-        row.raw = comma_y
+        row.friendly = "%.1f %s" % [units_y[0],units_y[1]]
+        row.comma = comma_y
+        row.raw = y
         @rdata << row
       end
 
-      path = File.join(Gem.datadir(PACKAGE),"report.txt.erb")
+      path = File.join(Gem.datadir(PACKAGE),"report.html.erb")
       fd = File.open(path)
       template = fd.read
       fd.close
-      renderer = ERB.new(template)
+      $log.debug("about to create renderer...")
+      renderer = ERB.new(template,nil,">")
+      $log.debug("rendering... #{@rdata.length}")
       outFD.write(renderer.result(binding))
       
     end

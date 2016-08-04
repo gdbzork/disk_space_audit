@@ -1,4 +1,5 @@
 require "find"
+require "net/ssh"
 require "diskAudit/auditData"
 require "diskAudit/version"
 
@@ -6,6 +7,10 @@ require "diskAudit/version"
 #
 # @author Gord Brown
 module DiskAudit
+
+  USER = "brown22"
+  RUBY_BIN = "/opt/software/ruby/ruby-2.3.1/bin"
+  REMOTE = "bioinfDiskAudit"
 
   # Top-level class to carry out an audit, and ultimately generate a report.
   class DiskAudit
@@ -18,15 +23,30 @@ module DiskAudit
         if FileTest.file?(p)
           data.add(p)
         else
-          puts "Visiting '#{p}'..."
+          $log.debug("Visiting '#{p}'...")
         end
       end
     end
 
-    def dump_dirs(paths)
+    def dump_dir(path)
+      $log.debug("Processing '#{path}'...")
+      data = AuditData.new
+      audit(path,data)
+      Marshal.dump(data,STDOUT)
     end
 
     def execute_remote(paths)
+      paths.each do |arg|
+        components = arg.split(":")
+        $log.debug("host: #{components[0]}  target: #{components[1]}")
+        Net::SSH.start(components[0],USER) do |ssh|
+          raw = ssh.exec!("#{RUBY_BIN}/ruby #{RUBY_BIN}/#{REMOTE} dump #{components[1]}")
+          data = Marshal.load(raw)
+          STDOUT.write("<h3>#{arg}</h3>\n")
+#          STDOUT.write(raw)
+          data.report(STDOUT)
+        end
+      end
     end
 
     def report(paths)
