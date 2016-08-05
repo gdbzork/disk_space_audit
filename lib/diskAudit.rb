@@ -11,6 +11,7 @@ module DiskAudit
   USER = "brown22"
   RUBY_BIN = "/opt/software/ruby/ruby-2.3.1/bin"
   REMOTE = "bioinfDiskAudit"
+  TARGET = "/var/www/html/diskAudit"
 
   # Top-level class to carry out an audit, and ultimately generate a report.
   class DiskAudit
@@ -28,6 +29,28 @@ module DiskAudit
       end
     end
 
+    def generate_report(data)
+      js = File.join(Gem.datadir(PACKAGE),"sorttable.js")
+      css = File.join(Gem.datadir(PACKAGE),"report.css")
+      FileUtils.cp(js,TARGET)
+      FileUtils.cp(css,TARGET)
+      @args = []
+      @rdata = {}
+      data.each do |k,v|
+        @args << k
+        @rdata[k] = v.report()
+      end
+
+      path = File.join(Gem.datadir(PACKAGE),"report.html.erb")
+      fd = File.open(path)
+      template = fd.read
+      fd.close
+      $log.debug("about to create renderer...")
+      renderer = ERB.new(template,nil,">")
+      $log.debug("rendering... #{@rdata.length}")
+      outFD.write(renderer.result(binding))
+    end
+
     def dump_dir(path)
       $log.debug("Processing '#{path}'...")
       data = AuditData.new
@@ -41,12 +64,10 @@ module DiskAudit
         $log.debug("host: #{components[0]}  target: #{components[1]}")
         Net::SSH.start(components[0],USER) do |ssh|
           raw = ssh.exec!("#{RUBY_BIN}/ruby #{RUBY_BIN}/#{REMOTE} dump #{components[1]}")
-          data = Marshal.load(raw)
-          STDOUT.write("<h3>#{arg}</h3>\n")
-#          STDOUT.write(raw)
-          data.report(STDOUT)
+          data[arg] = Marshal.load(raw)
         end
       end
+      generate_report(data)
     end
 
     def report(paths)

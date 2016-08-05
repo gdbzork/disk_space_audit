@@ -1,5 +1,6 @@
 require "ostruct"
 require "erb"
+require "fileutils"
 
 require "diskAudit/version"
 require "diskAudit/friendlyNumbers"
@@ -25,8 +26,8 @@ module DiskAudit
       @store[s.uid] = @store.fetch(s.uid,0) + s.size
     end
 
-    def report(outFD)
-      @rdata = []
+    def report()
+      rdata = []
       @store.each do |x,y|
         begin
           n = Etc.getpwuid(x).name
@@ -42,19 +43,20 @@ module DiskAudit
         row = OpenStruct.new
         row.name = n
         row.friendly = "%.1f %s" % [units_y[0],units_y[1]]
-        row.comma = comma_y
+#        row.comma = comma_y
         row.raw = y
-        @rdata << row
+        rdata << row
       end
+      return rdata
 
-      path = File.join(Gem.datadir(PACKAGE),"report.html.erb")
-      fd = File.open(path)
-      template = fd.read
-      fd.close
-      $log.debug("about to create renderer...")
-      renderer = ERB.new(template,nil,">")
-      $log.debug("rendering... #{@rdata.length}")
-      outFD.write(renderer.result(binding))
+#      path = File.join(Gem.datadir(PACKAGE),"report.html.erb")
+#      fd = File.open(path)
+#      template = fd.read
+#      fd.close
+#      $log.debug("about to create renderer...")
+#      renderer = ERB.new(template,nil,">")
+#      $log.debug("rendering... #{@rdata.length}")
+#      outFD.write(renderer.result(binding))
       
     end
 

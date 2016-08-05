@@ -1,9 +1,23 @@
+<html>
+<head>
+  <title>Disk Space Report</title>
+  <link rel="stylesheet" type="text/css" href="report.css">
+  <script src="sorttable.js"></script>
+</head>
+<body>
+<h2>Disk Space Report</h2>
 
-<table>
-  <thead>
-    <th>User</th><th>Disk Space (friendly)</th><th>Disk Space (bytes)</th>
-  </thead>
-  <% @rdata.each do |row| %>
-    <tr><td><%= row.name %></td><td><%= row.friendly %></td><td><%= row.comma %>a</td></tr>
-  <% end %>
-</table>
+<% @args.each do |arg| %>
+  <h3><%= arg %></h3>
+  <table class="sortable">
+    <thead>
+      <th>User</th><th class="right">Disk Space</th>
+    </thead>
+    <% @rdata[arg].each do |row| %>
+      <tr><td><%= row.name %></td><td sorttable_customkey="<%= row.raw %>" class="right"><%= row.friendly %></td></tr>
+    <% end %>
+  </table>
+
+<% end %>
+</body>
+</html>
