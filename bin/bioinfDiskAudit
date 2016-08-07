@@ -18,7 +18,7 @@ def setupOptions()
 end
 
 $log = Logger.new(File.open(LOGFILE,mode="a"))
-$log.level = Logger::DEBUG
+$log.level = Logger::INFO
 
 setupOptions.parse!
 cmd = ARGV[0]

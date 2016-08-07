@@ -1,11 +1,15 @@
-==== Disk Space Report ====
 
-<% @hosts.each do |host| %>
-=== <%= host %> <%= @paths[host] %> ===
+==== Disk Space Report: <%= @date %> ====
 
-^ User ^ Disk Space (friendly) ^ Disk Space (bytes) ^
-  <% @rdata[host].each do |row| %>
-| <%= row.name %> |  <%= row.friendly %> |  <%= row.comma %> |
+<% @args.each do |arg| %>
+=== <%= arg %> ===
+
+^ User ^ Disk Space ^
+  <% @rdata[arg].each do |row| %>
+<%= row.name %> | <%= row.friendly %> |
+    <% row.big.each do |b| %>
+                | <%= b.friendly %> <%= b.path %> |
+    <% end %>
   <% end %>
 
 <% end %>

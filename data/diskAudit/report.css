@@ -1,3 +1,15 @@
 .right {
   text-align: right;
 }
+
+.hidden {
+  display: none;
+}
+
+.small {
+  font-size: 65%;
+}
+
+tbody tr.coloured:nth-child(even) { background: #B2F0D1; vertical-align: top; }
+tbody tr.coloured:nth-child(odd) { background: #E6FAF0; vertical-align: top; }
+
