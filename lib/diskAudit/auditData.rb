@@ -11,7 +11,7 @@ module DiskAudit
   #
   class PathData
 
-    THRESHOLD = 268435456 # roughly 100Gb / 512 (blocks)
+    THRESHOLD = 268435456 # 2^37 bytes / 512 (blocks), or roughly 137Gb
 
     def initialize()
       @paths = Hash.new
@@ -38,14 +38,27 @@ module DiskAudit
       end
     end
 
+#    def identify_r(path,current,candidates)
+#      reported = false
+#      current.kids.each do |component,os|
+#        reported = true if identify_r(File.join(path,component),os,candidates)
+#      end
+#      if not reported and current.total > THRESHOLD
+#        candidates[path] = current.total
+#        reported = true
+#      end
+#      return reported
+#    end
+
     def identify_r(path,current,candidates)
-      reported = false
+      reported = 0
       current.kids.each do |component,os|
-        reported = true if identify_r(File.join(path,component),os,candidates)
+        reported = [reported,identify_r(File.join(path,component),os,candidates)].max
       end
-      if not reported and current.total > THRESHOLD
+      mult = (current.total / THRESHOLD).to_i
+      if mult > reported
         candidates[path] = current.total
-        reported = true
+        reported = mult
       end
       return reported
     end
