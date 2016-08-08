@@ -56,7 +56,7 @@ module DiskAudit
         reported = [reported,identify_r(File.join(path,component),os,candidates)].max
       end
       mult = (current.total / THRESHOLD).to_i
-      if mult > reported
+      if mult >= 1 and mult >= reported * 2
         candidates[path] = current.total
         reported = mult
       end

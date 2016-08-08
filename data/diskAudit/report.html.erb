@@ -31,10 +31,10 @@
         <td sorttable_customkey="<%= row.raw %>" class="right"><%= row.friendly %></td>
         <td><% if row.big.length > 0 %>
           <span class="small"><a href="#" onClick="return toggleVisible('<%= arg %>_<%= row.name %>');">Show/Hide</a></span>
-          <table id="<%= arg %>_<%= row.name %>" class="hidden" onClick>
-            <thead><th>Size</th><th>Path</th></thead>
+          <table id="<%= arg %>_<%= row.name %>" class="hidden sortable">
+            <thead><th>Size</th><th class="sorttable_alpha">Path</th></thead>
             <% row.big.each do |big| %>
-              <tr><td class="right"><%= big.friendly%></td><td><%= big.path%></td></tr>
+              <tr><td class="right" sorttable_customkey="<%= big.size %>"><%= big.friendly %></td><td><%= big.path %></td></tr>
             <% end %>
           </table><% end %></td>
       </tr>
