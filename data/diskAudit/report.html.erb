@@ -20,7 +20,8 @@
 <h2>Disk Space Report: <%= @date %></h2>
 
 <% @args.each do |arg| %>
-  <h3><%= arg %></h3>
+  <% vol = @volInfo[arg] %>
+  <h2><%= arg %> | <span class="small">Size: <%= vol["Size"] %>&nbsp&nbspUsed: <%= vol["Used"] %>&nbsp&nbspAvail: <%= vol["Avail"] %></span></h2>
   <table class="sortable">
     <thead>
       <th class="sorttable_alpha">User</th><th class="right">Disk Space</th><th>Big Directories</th>

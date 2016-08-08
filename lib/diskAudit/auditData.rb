@@ -110,6 +110,18 @@ module DiskAudit
       @bigDirs = @tree.identify()
     end
 
+    def getVolumeInfo(path)
+      stdout  = `df -h #{path}`
+      lines = stdout.split("\n")
+      heads = lines[0].split
+      values = lines[1].split
+      @volumeInfo = {heads[1] => values[1], heads[2] => values[2], heads[3] => values[3]}
+    end
+
+    def volumeInfo()
+      return @volumeInfo
+    end
+
     def report()
       rdata = []
       @blocks.each do |x,y|

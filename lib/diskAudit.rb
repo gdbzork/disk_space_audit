@@ -52,9 +52,11 @@ module DiskAudit
       FileUtils.cp(css,TARGET)
       @args = []
       @rdata = {}
+      @volInfo = {}
       data.each do |k,v|
         @args << k
         @rdata[k] = v.report()
+        @volInfo[k] = v.volumeInfo()
       end
       @date = Date.today.iso8601
 
@@ -80,6 +82,7 @@ module DiskAudit
       data = AuditData.new
       audit(path,data)
       data.mkBigDirs()
+      data.getVolumeInfo(path)
       Marshal.dump(data,STDOUT)
     end
 
