@@ -21,7 +21,7 @@
 
 <% @args.each do |arg| %>
   <% vol = @volInfo[arg] %>
-  <h2><%= arg %> | <span class="small">Size: <%= vol["Size"] %>&nbsp&nbspUsed: <%= vol["Used"] %>&nbsp&nbspAvail: <%= vol["Avail"] %></span></h2>
+  <h2><%= arg %>&nbsp;&nbsp;&nbsp;&nbsp;<span class="small">Size: <%= vol["Size"] %>&nbsp&nbspUsed: <%= vol["Used"] %>&nbsp&nbspAvail: <%= vol["Avail"] %></span></h2>
   <table class="sortable">
     <thead>
       <th class="sorttable_alpha">User</th><th class="right">Disk Space</th><th>Big Directories</th>
