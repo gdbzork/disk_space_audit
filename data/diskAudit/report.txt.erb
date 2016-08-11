@@ -2,10 +2,12 @@
 ==== Disk Space Report: <%= @date %> ====
 
 <% @args.each do |arg| %>
+  <% info = @rdata[arg].info %>
+
 === <%= arg %> ===
 
 ^ User ^ Disk Space ^
-  <% @rdata[arg].each do |row| %>
+  <% @rdata[arg].rdata.each do |row| %>
 <%= row.name %> | <%= row.friendly %> |
     <% row.big.each do |b| %>
                 | <%= b.friendly %> <%= b.path %> |

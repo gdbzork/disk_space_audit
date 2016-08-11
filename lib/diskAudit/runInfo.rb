@@ -3,6 +3,13 @@ module DiskAudit
   # Store some information about this run, such as start and end times, the
   # host, and the path that was evaluated.
   class RunInfo
+    def initialize
+      @host = `hostname`.strip
+    end
+
+    # Retrieve run host
+    attr_reader :host
+
     # Set the start time.
     def setStart
       @start = Time.now
@@ -17,8 +24,6 @@ module DiskAudit
     # Retrieve the done time.
     attr_reader :done
 
-    # The host on which this run occurred
-    attr_accessor :host
     # The path that was evaluated on this run
     attr_reader :path
     def path=(path)

@@ -36,6 +36,15 @@ module DiskAudit
       return @num.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
     end
 
+    def fmt
+      if @units == 'b'
+        f = "%d %s" % [@sig,@units]
+      else
+        f = "%.1f %s" % [@sig,@units]
+      end
+      return f
+    end
+
     private
     def toUnits(num)
       flip = false

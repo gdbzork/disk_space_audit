@@ -20,13 +20,14 @@
 <h2>Disk Space Report: <%= @date %></h2>
 
 <% @args.each do |arg| %>
-  <% vol = @volInfo[arg] %>
-  <h2><%= arg %>&nbsp;&nbsp;&nbsp;&nbsp;<span class="small">Size: <%= vol["Size"] %>&nbsp&nbspUsed: <%= vol["Used"] %>&nbsp&nbspAvail: <%= vol["Avail"] %></span></h2>
+  <% info = (@rdata[arg]).info %>
+  <h2><%= arg %>&nbsp;&nbsp;&nbsp;&nbsp;<span class="small">Size: <%= info.size %>&nbsp&nbspUsed: <%= info.used %>&nbsp&nbspAvail: <%= info.avail %></span></h2>
+  <p>start: <%= info.start.strftime("%H:%M:%S") %>&nbsp;&nbsp;&nbsp;done: <%= info.done.strftime("%H:%M:%S") %>&nbsp;&nbsp;&nbsp;<a href="logs_<%= arg %>.html">logs</a></p>
   <table class="sortable">
     <thead>
       <th class="sorttable_alpha">User</th><th class="right">Disk Space</th><th>Big Directories</th>
     </thead>
-    <% @rdata[arg].each do |row| %>
+    <% @rdata[arg].rdata.each do |row| %>
       <tr class="coloured">
         <td sorttable_customkey="<%= row.name %>"><%= row.name %></td>
         <td sorttable_customkey="<%= row.raw %>" class="right"><%= row.friendly %></td>

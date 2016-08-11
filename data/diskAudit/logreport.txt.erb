@@ -1,0 +1,36 @@
+<% if @links.length > 0 or @access.length > 0 or @messages.length > 0 %>
+Log Report: <%= @tag %> 
+==============================
+
+
+<% if @links.length > 0 %>
+Broken Links
+------------
+
+<% @links.each do |link| %>
+<%= link.stamp %> <%= link.path %> 
+<% end %>
+
+
+<% end %>
+<% if @access.length > 0 %>
+Access Denied
+-------------
+
+<% @access.each do |acc| %>
+<%= acc.stamp %> <%= acc.path %> 
+<% end %>
+
+
+<% end %>
+<% if @messages.length > 0 %>
+Messages
+--------
+
+<% @messages.each do |msg| %>
+<%= msg.stamp %> <%= msg.msg %> 
+<% end %>
+<% end %>
+<% else %>
+No Log Messages: <%= @tag %> 
+<% end %>

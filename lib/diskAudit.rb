@@ -3,18 +3,12 @@ require "net/ssh"
 require "date"
 
 require "diskAudit/auditData"
-require "diskAudit/version"
+require "diskAudit/constants"
 
 # Audits a path or paths on disk, reporting disk usage by user.
 #
 # @author Gord Brown
 module DiskAudit
-
-  USER = "brown22"
-  RUBY_BIN = "/opt/software/ruby/ruby-2.3.1/bin"
-  REMOTE = "bioinfDiskAudit"
-  TARGET = "/var/www/html/diskAudit"
-  DEST = "/var/www/html/diskAudit/diskReport.html"
 
   # Top-level class to carry out an audit, and ultimately generate a report.
   class DiskAudit
@@ -22,116 +16,146 @@ module DiskAudit
     # Audits a path.
     # @param path [String] the string representation of the path to audit
     # @return [AuditData] the results of the audit for this path
-    def audit(path,data)
+    def audit(data)
+      data.info.setStart
+      path = data.info.path
       Find.find(path) do |p|
         if FileTest.symlink?(p)
           data.add(p)
           begin
             File.stat(p)
           rescue
-            $log.info("Broken SymLink: '#{p}'")
+            data.log.broken_link(p)
           end
           Find.prune
         elsif FileTest.file?(p)
           data.add(p)
         else
           if not FileTest.readable?(p)
-            $log.warn("PERMISSION DENIED: '#{p}'")
+            data.log.denied(p)
           else
-            $log.debug("Visiting '#{p}'...")
             data.add(p)
           end
         end
       end
+      data.mkBigDirs()
+      data.info.setDone
     end
 
-    def generate_report(data)
-      js = File.join(Gem.datadir(PACKAGE),"sorttable.js")
-      css = File.join(Gem.datadir(PACKAGE),"report.css")
-      FileUtils.cp(js,TARGET)
-      FileUtils.cp(css,TARGET)
-      @args = []
-      @rdata = {}
-      @volInfo = {}
-      data.each do |k,v|
-        @args << k
-        @rdata[k] = v.report()
-        @volInfo[k] = v.volumeInfo()
+    def generate_report(options,args,rdata)
+      template_path = Gem.datadir(PACKAGE)
+      if not File.exist?(template_path)
+        template_path = File.expand_path("../data/diskAudit",File.dirname(__FILE__))
       end
-      @date = Date.today.iso8601
 
-      path = File.join(Gem.datadir(PACKAGE),"report.html.erb")
+      if options.format == :html
+        if options.target != '-'
+          js = File.join(template_path,"sorttable.js")
+          css = File.join(template_path,"report.css")
+          FileUtils.cp(js,options.target)
+          FileUtils.cp(css,options.target)
+        end
+        path = File.join(template_path,"report.html.erb")
+      else
+        path = File.join(template_path,"report.txt.erb")
+      end
       fd = File.open(path)
       template = fd.read
       fd.close
-      $log.debug("about to create renderer...")
+
+      @date = Date.today.iso8601
+      @args = args
+      @rdata = rdata
+      STDERR.puts("raw data len: #{@rdata.length}")
+      STDERR.puts("raw data 0: #{@rdata[0].class}")
       renderer = ERB.new(template,nil,">")
-      $log.debug("rendering... #{@rdata.length}")
-      outFD = File.open(DEST,"w")
+      if options.target == '-'
+        outFD = STDOUT
+      else
+        outFD = File.open(File.join(options.target,REPORTNAME),"w")
+      end
       outFD.write(renderer.result(binding))
-      outFD.close()
+      if options.target != '-'
+        outFD.close()
+      end
+
+      # get logs template
+      if options.format == :html
+        tempNm = "logreport.html.erb"
+      else
+        tempNm = "logreport.txt.erb"
+      end
+      log_template_path = File.join(template_path,tempNm)
+      fd = File.open log_template_path
+      template = fd.read
+      fd.close
+      renderer = ERB.new(template,nil,">")
+
+      # write log files
+      @rdata.each do |tag,data|
+        vtag = tag.gsub("/","_")
+        if options.target == '-'
+          fd = STDOUT
+        else
+          fd = File.open(File.join(options.target,LOGTEMPLATE % [vtag]),"w")
+        end
+        fd.write(renderer.result(data.log.getBinding))
+        if options != '-'
+          fd.close
+        end
+      end
+
     end
 
-    def dump_dir(path)
+    def dump(path,options)
+      tag = "#{`hostname`.strip}:#{path}"
       if not File.exist?(path)
-        $log.error("No such path: '#{path}'...")
-        STDOUT.write("No such path: '#{path}'...\n")
+        STDERR.write("No such path: '#{path}'...\n")
         return
       end
-      $log.debug("Processing '#{path}'...")
-      data = AuditData.new
-      audit(path,data)
-      data.mkBigDirs()
-      data.getVolumeInfo(path)
+      data = AuditData.new(tag,path)
+      audit(data)
       Marshal.dump(data,STDOUT)
     end
 
-    def execute_remote(paths)
+    def execute_remote(paths,options)
       data = {}
       paths.each do |arg|
         components = arg.split(":")
-        $log.debug("host: #{components[0]}  target: #{components[1]}")
-        Net::SSH.start(components[0],USER) do |ssh|
-          raw = ssh.exec!("#{RUBY_BIN}/ruby #{RUBY_BIN}/#{REMOTE} dump #{components[1]}")
+        Net::SSH.start(components[0],options.user) do |ssh|
+          raw = ssh.exec!("#{PROGNAME} dump #{components[1]}")
           begin
             data[arg] = Marshal.load(raw)
           rescue
-            $log.error("Got unexpected result from '#{arg}': #{raw}")
+            STDERR.puts("Got unexpected result from '#{arg}': #{raw}")
           end
         end
       end
-      generate_report(data)
+      args = []
+      rdata = {}
+      data.each do |k,v|
+        args << k
+        v.prepare
+        rdata[k] = v
+      end
+      generate_report(options,args,rdata)
     end
 
-    def report(paths)
-      @date = Date.today.iso8601
-      host = `hostname`.strip
-      @args = []
-      @rdata = {}
-      paths.each do |arg|
-        if not File.exist? arg
-          $log.error("No such path: '#{arg}'")
-          next
-        end
-        $log.info("Processing '#{arg}'...")
-        data = AuditData.new
-        audit(arg,data)
-        data.mkBigDirs()
-        full = "#{host}:#{arg}"
-        @args << full
-        @rdata[full] = data.report
+    def execute_local(path,options)
+      begin
+        tag = "#{`hostname`.strip}:#{path}"
+        data = AuditData.new(tag,path)
+        audit(data)
+        data.prepare # generate report-formatted data
+
+        args = [tag]
+        rdata = {tag => data}
+        generate_report(options,args,rdata)
+
+      rescue Errno::ENOENT => noent
+        STDERR.puts "Path not found: '#{path}'"
+        STDERR.puts noent.to_s
       end
-      path = File.join(Gem.datadir(PACKAGE),"report.txt.erb")
-      if not File.exist?(path)
-        path = File.expand_path("../data/diskAudit/report.txt.erb",File.dirname(__FILE__))
-      end
-      fd = File.open(path)
-      template = fd.read
-      fd.close
-      $log.debug("about to create renderer...")
-      renderer = ERB.new(template,nil,">")
-      $log.debug("rendering... #{@rdata.length}")
-      STDOUT.write(renderer.result(binding))
     end
 
   end

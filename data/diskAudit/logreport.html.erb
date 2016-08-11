@@ -1,0 +1,56 @@
+<html>
+<head>
+  <title>Log Report: <%= @tag %></title>
+  <link rel="stylesheet" type="text/css" href="report.css">
+  <script src="sorttable.js"></script>
+  <script type="text/javascript">
+    toggleVisible = function(id) {
+      var tbl = document.getElementById(id).style;
+      if (tbl.display == 'none' || tbl.display == '') {
+          tbl.display = 'block';
+      } else {
+          tbl.display = 'none';
+      }
+      return false;
+    }
+  </script>
+
+</head>
+<body>
+  <% if @links.length > 0 or @access.length > 0 or @messages.length > 0 %>
+    <h2>Log Report: <%= @tag %></h2>
+    
+    <% if @links.length > 0 %>
+      <h3>Broken Links</h3>
+      <table class="sortable">
+        <thead><th>Time</th><th class="sorttable_alpha">Path</th></thead>
+        <% @links.each do |link| %>
+          <tr><td><%= link.stamp %></td><td><%= link.path %></td></tr>
+        <% end %>
+      </table>
+    <% end %>
+    
+    <% if @access.length > 0 %>
+      <h3>Access Denied</h3>
+      <table class="sortable">
+        <thead><th>Time</th><th class="sorttable_alpha">Path</th></thead>
+        <% @access.each do |acc| %>
+          <tr><td><%= acc.stamp %></td><td><%= acc.path %></td></tr>
+        <% end %>
+      </table>
+    <% end %>
+    
+    <% if @messages.length > 0 %>
+      <h3>Messages</h3>
+      <table class="sortable">
+        <thead><th>Time</th><th class="sorttable_alpha">Message</th></thead>
+        <% @messages.each do |msg| %>
+          <tr><td><%= msg.stamp %></td><td><%= msg.msg %></td></tr>
+        <% end %>
+      </table>
+    <% end %>
+  <% else %>
+    <h2>No Log Messages: <%= @tag %></h2>
+  <% end %>
+</body>
+</html>

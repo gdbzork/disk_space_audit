@@ -7,7 +7,7 @@ module DiskAudit
   class Logs
     # Constructor
     #
-    # @param [String] the tag describing this invocation of bioinfDiskAudit
+    # @param tag [String] the tag describing this invocation of bioinfDiskAudit
     def initialize(tag)
       @tag = tag
       @links = []
@@ -41,6 +41,10 @@ module DiskAudit
 
     def exception?
       return @exception != nil
+    end
+
+    def getBinding
+      return binding
     end
   end
 end
