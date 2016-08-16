@@ -66,8 +66,6 @@ module DiskAudit
       @date = Date.today.iso8601
       @args = args
       @rdata = rdata
-      STDERR.puts("raw data len: #{@rdata.length}")
-      STDERR.puts("raw data 0: #{@rdata[0].class}")
       renderer = ERB.new(template,nil,">")
       if options.target == '-'
         outFD = STDOUT

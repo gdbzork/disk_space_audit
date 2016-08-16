@@ -18,6 +18,8 @@ module DiskAudit
              853250745 => "halim01",
              899611315 => "macart01",
              413334374 => "carrol09",
+             1843454863 => "vowler01",
+             1611831722 => "sannar01",
             }
 
     def initialize(tag,path)
