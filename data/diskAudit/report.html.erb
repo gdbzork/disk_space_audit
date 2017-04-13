@@ -21,8 +21,10 @@
 
 <% @args.each do |arg| %>
   <% info = (@rdata[arg]).info %>
-  <h2><%= arg %>&nbsp;&nbsp;&nbsp;&nbsp;<span class="small">Size: <%= info.size %>&nbsp&nbspUsed: <%= info.used %>&nbsp&nbspAvail: <%= info.avail %></span></h2>
-  <p>start: <%= info.start.strftime("%H:%M:%S") %>&nbsp;&nbsp;&nbsp;done: <%= info.done.strftime("%H:%M:%S") %>&nbsp;&nbsp;&nbsp;<a href="logs_<%= arg.gsub("/","_") %>.html">logs</a></p>
+  <h2><%= arg %></h2>
+  <p>Size: <%= info.size %>&nbsp;&nbsp;Avail: <%= info.avail %>&nbsp;&nbsp;Used(all): <%= info.used %><br>
+  <% if !info.quota.nil? %>Quota: <%= info.quota %>&nbsp;&nbsp;Limit: <%= info.limit %>&nbsp;&nbsp;Used(group): <%= info.qused %><br><% end %>
+  Start: <%= info.start.strftime("%H:%M:%S") %>&nbsp;&nbsp;&nbsp;Done: <%= info.done.strftime("%H:%M:%S") %>&nbsp;&nbsp;&nbsp;<a href="logs_<%= arg.gsub("/","_") %>.html">logs</a></p>
   <table class="sortable">
     <thead>
       <th class="sorttable_alpha">User</th><th class="right">Disk Space</th><th>Big Directories</th>

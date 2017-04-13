@@ -1,6 +1,6 @@
 module DiskAudit
   # The version of the module, unsurprisingly.
-  VERSION = "1.0.3"
+  VERSION = "1.0.4"
   # The package name.
   PACKAGE = "diskAudit"
   private

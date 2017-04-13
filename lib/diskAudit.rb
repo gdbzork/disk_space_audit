@@ -1,6 +1,8 @@
 require "find"
 require "net/ssh"
 require "date"
+require "mail"
+require "socket"
 
 require "diskAudit/auditData"
 require "diskAudit/constants"
@@ -63,6 +65,11 @@ module DiskAudit
       template = fd.read
       fd.close
 
+      mailPath = File.join(template_path,"mailreport.txt.erb")
+      fd = File.open(mailPath)
+      mailTemplate = fd.read
+      fd.close
+
       @date = Date.today.iso8601
       @args = args
       @rdata = rdata
@@ -72,9 +79,15 @@ module DiskAudit
       else
         outFD = File.open(File.join(options.target,REPORTNAME),"w")
       end
-      outFD.write(renderer.result(binding))
+      body = renderer.result(binding)
+      mailRenderer = ERB.new(mailTemplate,nil,">")
+      mailBody = mailRenderer.result(binding)
+      outFD.write(body)
       if options.target != '-'
         outFD.close()
+      end
+      if !options.mailto.nil?
+        mailReport(mailBody,options.mailto)
       end
 
       # get logs template
@@ -97,12 +110,31 @@ module DiskAudit
         else
           fd = File.open(File.join(options.target,LOGTEMPLATE % [vtag]),"w")
         end
-        fd.write(renderer.result(data.log.getBinding))
-        if options != '-'
+        txt = renderer.result(data.log.getBinding)
+        fd.write(txt)
+        if options.target != '-'
           fd.close
         end
       end
+    end
 
+    def mailReport(text,addresses)
+      opts = {address: "10.20.221.14",
+              port: 25,
+              domain: "cruk.cam.ac.uk",
+              authentication: "plain",
+              tls: false,
+              enable_starttls_auto: false}
+      Mail.defaults do
+        delivery_method :smtp, opts
+      end
+      targets = addresses.split(",")
+      Mail.deliver do
+        from    "diskAudit@#{Socket.gethostname}"
+        to      targets
+        subject "disk space audit"
+        body    text
+      end
     end
 
     def dump(path,options)

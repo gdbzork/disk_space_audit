@@ -29,6 +29,7 @@ module DiskAudit
     def path=(path)
       @path = path
       setVolumeInfo
+      setQuotaInfo
     end
 
     # Size of the disk partition we're looking at
@@ -37,6 +38,12 @@ module DiskAudit
     attr_reader :used
     # Amount available of the disk partition we're looking at
     attr_reader :avail
+    # Space we've used (i.e. according to quota)
+    attr_reader :qused
+    # quota 
+    attr_reader :quota
+    # limit
+    attr_reader :limit
     private
     def setVolumeInfo
       stdout  = `df -h #{@path}`
@@ -48,6 +55,28 @@ module DiskAudit
       instance_variable_set("@#{heads[1].downcase}",values[1])
       instance_variable_set("@#{heads[2].downcase}",values[2])
       instance_variable_set("@#{heads[3].downcase}",values[3])
+    end
+
+    def lustre?
+      stdout = `stat --file-system --format=%T #{@path}`.strip
+      return stdout == "lustre"
+    end
+
+    def setQuotaInfo
+      if lustre?
+        stdout = `/usr/bin/lfs quota -g 1592081963 -h #{@path}`
+        lines = stdout.split("\n")
+        # same horrible hack
+        lines[2] = lines[2] + " " + lines[3] if lines.length == 4
+        flds = lines[2].split
+        @qused = flds[1]
+        @quota = flds[2]
+        @limit = flds[3]
+      else
+        @qused = nil
+        @quota = nil
+        @limit = nil
+      end
     end
   end
 end

@@ -8,12 +8,11 @@
 size: <%= info.size%>  avail: <%= info.avail %>  used (all): <%= info.used %>
 <% if !info.quota.nil? %>  quota: <%= info.quota %>  limit: <%= info.limit %>  used (group): <%= info.qused %><% end %>
 
-^ User ^ Disk Space ^
-  <% @rdata[arg].rdata.each do |row| %>
-<%= row.name %> | <%= row.friendly %> |
-    <% row.big.each do |b| %>
-                | <%= b.friendly %> <%= b.path %> |
-    <% end %>
-  <% end %>
 
+User       | Disk Space |
+  <% @rdata[arg].rdata.each do |row| %>
+<%= "%8s" % row.name %> | <%= "%10s" % row.friendly %> |
+  <% end %>
 <% end %>
+
+Full report: http://bioinf-wiki001.cri.camres.org/diskAudit/diskReport.html

@@ -24,7 +24,7 @@ module DiskAudit
 
     def initialize(tag,path)
       @info = RunInfo.new
-      @info.path = path
+      @info.path= path
       @log = Logs.new(tag)
       @blocks = Hash.new()
       @tree = PathData.new()
