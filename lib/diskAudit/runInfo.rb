@@ -1,3 +1,5 @@
+require "diskAudit/friendlyNumber"
+
 module DiskAudit
 
   # Store some information about this run, such as start and end times, the
@@ -64,14 +66,14 @@ module DiskAudit
 
     def setQuotaInfo
       if lustre?
-        stdout = `/usr/bin/lfs quota -g 1592081963 -h #{@path}`
+        stdout = `/usr/bin/lfs quota -g 1592081963 #{@path}`
         lines = stdout.split("\n")
         # same horrible hack
         lines[2] = lines[2] + " " + lines[3] if lines.length == 4
         flds = lines[2].split
-        @qused = flds[1]
-        @quota = flds[2]
-        @limit = flds[3]
+        @qused = FriendlyNumber.new(flds[1].to_i*1000).fmt
+        @quota = FriendlyNumber.new(flds[2].to_i*1000).fmt
+        @limit = FriendlyNumber.new(flds[3].to_i*1000).fmt
       else
         @qused = nil
         @quota = nil
