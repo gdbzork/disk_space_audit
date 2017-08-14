@@ -15,6 +15,11 @@ module DiskAudit
   # Top-level class to carry out an audit, and ultimately generate a report.
   class DiskAudit
 
+    def initialize(options)
+      options.logfile = DiskAudit::LOGFILE if options.logfile.nil?
+      @logger = Logger.new(options.logfile)
+    end
+
     # Audits a path.
     # @param path [String] the string representation of the path to audit
     # @return [AuditData] the results of the audit for this path

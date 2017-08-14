@@ -1,26 +1,26 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
+require "etc"
 require "optparse"
 require "ostruct"
 
 require "diskAudit"
 require "diskAudit/constants"
 
-options = OpenStruct.new(output: nil,
-                         format: nil,
+options = OpenStruct.new(format: nil,
                          target: "/var/www/html/diskAudit",
-                         user: "brown22",
+                         user: Etc.getlogin,
                          mailto: nil)
 
 begin
   OptionParser.new do |o|
     o.banner = "Usage: #{File.basename($0)} [options] dump|remote|local <parameters>"
-    o.on("-oFILE","--output FILE","output location for binary output (STDOUT)") {|o| options.output = o}
     o.on("-fFMT","--format FMT",[:txt,:html],"format of output (txt, html)") {|f| options.format = f.to_sym}
     o.on("-tDIR","--target DIR","target directory for report output ('-' for STDOUT)") {|t| options.target = t}
     o.on("-mADDRS","--mailto ADDRS","comma-separated list of addresses to mail to") {|t| options.mailto = t}
     o.on("-uUSER","--user USER","user for ssh to remote hosts") {|u| options.user = u}
+    o.on("-lLOGFILE","--logfile LOGFILE","log file for system logs") {|l| options.logfile = l}
     o.on("-v","--version","show version of the software") do
       puts "version #{DiskAudit::VERSION}"
       exit
@@ -41,7 +41,7 @@ if cmd.nil?
   exit
 end
 
-auditor = DiskAudit::DiskAudit.new
+auditor = DiskAudit::DiskAudit.new(options)
 case cmd
   when "dump"
     auditor.dump(ARGV[1],options)
