@@ -6,21 +6,29 @@ require "optparse"
 require "ostruct"
 
 require "diskAudit"
+require "diskAudit/configuration"
 require "diskAudit/constants"
 
-options = OpenStruct.new(format: nil,
-                         target: "/var/www/html/diskAudit",
-                         user: Etc.getlogin,
-                         mailto: nil)
+# Defaults for configuration object.
+CONFIG_DEFAULT = "../../data/diskAudit/configuration.yaml"
+config_defaults = Hash.new(config_file: File.expand_path(CONFIG_DEFAULT,__FILE__),
+                           format: :text,
+                           destination: "./tmp",
+                           ssh_user: Etc.getlogin,
+                           log_level: :warn)
 
+# Get the command-line parameters
+args = {}
 begin
   OptionParser.new do |o|
-    o.banner = "Usage: #{File.basename($0)} [options] dump|remote|local <parameters>"
-    o.on("-fFMT","--format FMT",[:txt,:html],"format of output (txt, html)") {|f| options.format = f.to_sym}
-    o.on("-tDIR","--target DIR","target directory for report output ('-' for STDOUT)") {|t| options.target = t}
-    o.on("-mADDRS","--mailto ADDRS","comma-separated list of addresses to mail to") {|t| options.mailto = t}
-    o.on("-uUSER","--user USER","user for ssh to remote hosts") {|u| options.user = u}
-    o.on("-lLOGFILE","--logfile LOGFILE","log file for system logs") {|l| options.logfile = l}
+    o.banner = "Usage: #{File.basename($0)} [options] dump|remote|local [<path>]"
+    o.on("--config FILE","location of the configuration file") {|c| args[:config_file] = c}
+    o.on("--destination DIR","target directory for report output") {|t| args[:destination] = t}
+    o.on("-d","--dump","write configuration to stdout") {|d| args[:just_dump] = true}
+    o.on("--format FMT",[:text,:html],"format of output (text, html)") {|f| args[:format] = f.to_sym}
+    o.on("--level LOGLEVEL","level of logging to perform") {|l| args[:log_level] = l.to_sym}
+    o.on("--logfile FILE","log file for system logs") {|l| args[:logfile] = l}
+    o.on("--nomail","do not send emails") {|e| args[:nomail] = true}
     o.on("-v","--version","show version of the software") do
       puts "version #{DiskAudit::VERSION}"
       exit
@@ -35,22 +43,22 @@ rescue OptionParser::ParseError => pe
   exit
 end
 
+config = DiskAudit::Configuration.new(config_defaults,args)
+
 cmd = ARGV[0]
 if cmd.nil?
   STDERR.puts "Missing subcommand (\"dump\", \"remote\", \"local\")"
   exit
 end
 
-auditor = DiskAudit::DiskAudit.new(options)
+auditor = DiskAudit::DiskAudit.new(config)
 case cmd
   when "dump"
-    auditor.dump(ARGV[1],options)
+    auditor.dump(ARGV[1])
   when "remote"
-    options.format = :html if options.format.nil?
-    auditor.execute_remote(ARGV[1..-1],options)
+    auditor.execute_remote(ARGV[1..-1])
   when "local"
-    options.format = :txt if options.format.nil?
-    auditor.execute_local(ARGV[1],options)
+    auditor.execute_local(ARGV[1..-1])
   else
     STDERR.puts "Unknown subcommand '#{cmd}' (try \"dump\", \"remote\", \"local\")\n"
 end

@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
                           information about users' disk usage, including what
                           directories are large, and what sorts of files are
                           taking up space (e.g. BAM, fastq).}
-  spec.homepage      = "https://github.com/gdbzork"
+  spec.homepage      = "https://github.com/gdbzork/disk_space_audit"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -35,4 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_runtime_dependency "net-ssh", "~> 3.2"
   spec.add_runtime_dependency "mail", "~> 2.6"
+  spec.add_development_dependency "yard", "~> 0.9.9"
+
+  spec.has_rdoc = 'yard'
 end

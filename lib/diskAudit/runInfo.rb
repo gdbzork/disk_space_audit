@@ -68,7 +68,7 @@ module DiskAudit
       if lustre?
         stdout = `/usr/bin/lfs quota -g 1592081963 #{@path}`
         lines = stdout.split("\n")
-        # same horrible hack
+        # same horrible hack as in setVolumeInfo
         lines[2] = lines[2] + " " + lines[3] if lines.length == 4
         flds = lines[2].split
         @qused = FriendlyNumber.new(flds[1].to_i*1000).fmt
