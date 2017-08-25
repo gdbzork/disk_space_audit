@@ -10,8 +10,8 @@ module DiskAudit
 
     def initialize(defaults,cmd_opts)
       @fields = defaults
-      if !cmds_opts[:config_file].nil?
-        path = cmds_opts[:config_file]
+      if !cmd_opts[:config_file].nil?
+        path = cmd_opts[:config_file]
       else
         path = defaults[:config_file]
       end

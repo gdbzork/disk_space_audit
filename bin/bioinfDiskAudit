@@ -10,12 +10,12 @@ require "diskAudit/configuration"
 require "diskAudit/constants"
 
 # Defaults for configuration object.
-CONFIG_DEFAULT = "../../data/diskAudit/configuration.yaml"
-config_defaults = Hash.new(config_file: File.expand_path(CONFIG_DEFAULT,__FILE__),
-                           format: :text,
-                           destination: "./tmp",
-                           ssh_user: Etc.getlogin,
-                           log_level: :warn)
+#CONFIG_DEFAULT = "../../data/diskAudit/configuration.yaml"
+#config_defaults = Hash.new(config_file: File.expand_path(CONFIG_DEFAULT,__FILE__),
+#                           format: :text,
+#                           destination: "./tmp",
+#                           ssh_user: Etc.getlogin,
+#                           log_level: :warn)
 
 # Get the command-line parameters
 args = {}
@@ -43,7 +43,7 @@ rescue OptionParser::ParseError => pe
   exit
 end
 
-config = DiskAudit::Configuration.new(config_defaults,args)
+config = DiskAudit::Configuration.new(DiskAudit::CONFIG_DEFAULTS,args)
 
 cmd = ARGV[0]
 if cmd.nil?

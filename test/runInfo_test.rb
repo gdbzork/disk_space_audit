@@ -3,12 +3,6 @@ require 'diskAudit/runInfo.rb'
 
 module DiskAudit
   class RunInfoTest < Minitest::Test
-    def test_set_host
-      a = RunInfo.new
-      a.host = "zork"
-      assert_equal("zork",a.host)
-    end
-
     def test_set_path
       a = RunInfo.new
       a.path = "."
