@@ -6,7 +6,7 @@ module DiskAudit
   # work, but for the comma-adding, decimals do not.
   #
   # For example, if the argument to the constructor is 23456, "commify" will
-  # return "23,456" (as a string), ".sig" will provide 2.3, and ".units"
+  # return "23,456" (as a string), ".sig" will provide 22.9, and ".units"
   # will return "Kb".
   class FriendlyNumber
 
@@ -16,9 +16,9 @@ module DiskAudit
     public
    
     # The "base" of the converted number with (at most) 1 digit after the
-    # decimal, e.g. 1.4
+    # decimal, for example 1.4
     attr_reader :sig
-    # The units of the converted number, e.g. "Gb"
+    # The units of the converted number, for example "Gb"
     attr_reader :units
 
     # The constructor.
@@ -36,6 +36,9 @@ module DiskAudit
       return @num.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
     end
 
+    # Format the number as a string, with significant digits and units.
+    #
+    # For example, 123456767 becomes "117.7 Mb".
     def fmt
       if @units == 'b'
         f = "%d %s" % [@sig,@units]

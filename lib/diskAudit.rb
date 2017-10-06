@@ -29,8 +29,7 @@ module DiskAudit
     end
 
     # Audits a path.
-    # @param path [String] the string representation of the path to audit
-    # @return [AuditData] the results of the audit for this path
+    # @param data [AuditData] the audit data object to start with, and add the results to.
     def audit(data)
       data.info.setStart
       path = data.info.path

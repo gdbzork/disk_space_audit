@@ -14,6 +14,7 @@ module DiskAudit
   #
   class AuditData
 
+    # Map of userids to usernames, for those that the system won't tell us about.
     CHEAT = {802161580 => "howe01",
              853250745 => "halim01",
              899611315 => "macart01",
