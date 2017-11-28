@@ -1,0 +1,39 @@
+destination: /var/www/html/diskAudit
+ssh_user: brown22
+admins:
+  - Gordon.Brown@cruk.cam.ac.uk
+targets: 
+  - bioinf-srv003:/data
+  - bioinf-srv005:/data
+  - bioinf-srv006:/data
+  - sol-srv003:/lustre/mib-cri
+  - sol-srv003:/lustre/reference_data/mib-cri
+  - nas-srv001:/mnt/data/bioinformatics
+  - clust1-headnode:/mnt/scratcha/bioinformatics
+  - clust1-headnode:/mnt/scratchb/bioinformatics
+exclude:
+  - bioinf-srv003:/data/reference_data
+  - bioinf-srv005:/data/reference_data
+  - bioinf-srv006:/data/reference_data
+people:
+  baller01 : Stephane.Ballereau@cruk.cam.ac.uk
+  bowers01 : Richard.Bowers@cruk.cam.ac.uk
+  brown22 : Gordon.Brown@cruk.cam.ac.uk
+  chilam01 : Chandra.Chilamakuri@cruk.cam.ac.uk
+  coutur01 : Dominique-Laurent.Couturier@cruk.cam.ac.uk
+  dunnin01 : Mark.Dunning@cruk.cam.ac.uk
+  edward03 : Abigail.Edwards@cruk.cam.ac.uk
+  eldrid01 : Matthew.Eldridge@cruk.cam.ac.uk
+  kishor01 : Kamal.Kishore@cruk.cam.ac.uk
+  menon01 : surajmenoncambridge@gmail.com
+  pajon01 : Anne.Pajon@cruk.cam.ac.uk
+  sawle01 : Ashley.Sawle@cruk.cam.ac.uk
+  stark01 : Rory.Stark@cruk.cam.ac.uk
+  su01 : Jing.Su@cruk.cam.ac.uk
+useridMap:
+  802161580 : howe01
+  853250745 : halim01
+  899611315 : macart01
+  413334374 : carrol09
+  1843454863 : vowler01
+  1611831722 : sannar01

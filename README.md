@@ -1,22 +1,34 @@
 # DiskAudit
 
-This gem audits disk usage on filesystem partitions.
+This application audits disk usage on filesystem partitions.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+To get the latest from GitHub, clone the repository from GitHub, build it,
+and install it:
 
-```ruby
-gem 'diskAudit'
+```bash
+git clone git@github.com:gdbzork/disk_space_audit.git
+cd disk_space_audit
 ```
 
-And then execute:
+Or to download a tagged release from GitHub, navigate to the "Releases" page on
+GitHub, pick the latest (normally), then 
 
-    $ bundle
+```bash
+tar xf disk_space_audit-N.n.x.tar.gz
+cd disk_space_audit-N.n.x
+```
 
-Or install it yourself as:
+Then
+```bash
+bundle
+gem build diskAudit.gemspec
+gem install diskAudit-N.n.x.gem
+```
 
-    $ gem install diskAudit
+where "N", "n" and "x" are the major release number, minor release number, and
+patch level.
 
 ## Usage
 
