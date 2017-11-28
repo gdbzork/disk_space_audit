@@ -1,5 +1,8 @@
 destination: /var/www/html/diskAudit
 ssh_user: brown22
+system_log: /var/log/diskAudit/diskAudit.log
+log_level: debug
+group_id: 1592081963
 admins:
   - Gordon.Brown@cruk.cam.ac.uk
 targets: 
@@ -25,7 +28,6 @@ people:
   edward03 : Abigail.Edwards@cruk.cam.ac.uk
   eldrid01 : Matthew.Eldridge@cruk.cam.ac.uk
   kishor01 : Kamal.Kishore@cruk.cam.ac.uk
-  menon01 : surajmenoncambridge@gmail.com
   pajon01 : Anne.Pajon@cruk.cam.ac.uk
   sawle01 : Ashley.Sawle@cruk.cam.ac.uk
   stark01 : Rory.Stark@cruk.cam.ac.uk

@@ -8,6 +8,7 @@ module DiskAudit
   #
   class PathData
 
+    # The reporting threshold: report directories larger than this.
     THRESHOLD = 268435456 # 2^37 bytes / 512 (blocks), or roughly 128Gb
 
     def initialize()

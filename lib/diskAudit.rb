@@ -9,15 +9,27 @@ require "diskAudit/constants"
 
 # Audits a path or paths on disk, reporting disk usage by user.
 #
+# The top-level class that does most of the work is {DiskAudit}.  The
+# top-level program just parses the command line and invokes the appropriate
+# method in this class.
+# 
+# The main data structure for storing the results is {AuditData}.  It
+# accumulates the main data that the gem collects, and processes it into
+# a form that is suitable for the reports to be generated.
+#
 # @author Gord Brown
 module DiskAudit
 
   # Top-level class to carry out an audit, and ultimately generate a report.
   class DiskAudit
 
+    def initialize(options)
+      options.logfile = DiskAudit::LOGFILE if options.logfile.nil?
+      @logger = Logger.new(options.logfile)
+    end
+
     # Audits a path.
-    # @param path [String] the string representation of the path to audit
-    # @return [AuditData] the results of the audit for this path
+    # @param data [AuditData] the audit data object to start with, and add the results to.
     def audit(data)
       data.info.setStart
       path = data.info.path
