@@ -7,17 +7,11 @@ admins:
   - Gordon.Brown@cruk.cam.ac.uk
 targets: 
   - bioinf-srv003:/data
-  - bioinf-srv005:/data
-  - bioinf-srv006:/data
-  - sol-srv003:/lustre/mib-cri
-  - sol-srv003:/lustre/reference_data/mib-cri
   - nas-srv001:/mnt/data/bioinformatics
   - clust1-headnode:/mnt/scratcha/bioinformatics
   - clust1-headnode:/mnt/scratchb/bioinformatics
 exclude:
   - bioinf-srv003:/data/reference_data
-  - bioinf-srv005:/data/reference_data
-  - bioinf-srv006:/data/reference_data
 people:
   baller01 : Stephane.Ballereau@cruk.cam.ac.uk
   bowers01 : Richard.Bowers@cruk.cam.ac.uk
