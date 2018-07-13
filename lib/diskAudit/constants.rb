@@ -2,7 +2,7 @@ require "etc"
 
 module DiskAudit
   # The version of the module, unsurprisingly.
-  VERSION = "2.0.1"
+  VERSION = "2.0.2"
   # The package name.
   PACKAGE = "diskAudit"
   # The name of the executable program.
