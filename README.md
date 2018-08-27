@@ -126,7 +126,7 @@ Several options control the behaviour of the program (defaults in square bracket
 
 `--destination *path*` -- directory in which to write output files [`./tmp`].
 
-`-d|--dump` -- write configuration to stdout (and exit).
+`-d|--default` -- write configuration to stdout (and exit).
 
 `--format text|html` -- output format, text or html [text].
 

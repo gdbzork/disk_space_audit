@@ -25,6 +25,7 @@ module DiskAudit
 
     def initialize(options)
       options.logfile = DiskAudit::LOGFILE if options.logfile.nil?
+      @options = options
       @logger = Logger.new(options.logfile)
     end
 
@@ -56,18 +57,18 @@ module DiskAudit
       data.info.setDone
     end
 
-    def generate_report(options,args,rdata)
+    def generate_report(args,rdata)
       template_path = Gem.datadir(PACKAGE)
       if not File.exist?(template_path)
         template_path = File.expand_path("../data/diskAudit",File.dirname(__FILE__))
       end
 
-      if options.format == :html
-        if options.target != '-'
+      if @options.format == :html
+        if @options.target != '-'
           js = File.join(template_path,"sorttable.js")
           css = File.join(template_path,"report.css")
-          FileUtils.cp(js,options.target)
-          FileUtils.cp(css,options.target)
+          FileUtils.cp(js,@options.target)
+          FileUtils.cp(css,@options.target)
         end
         path = File.join(template_path,"report.html.erb")
       else
@@ -86,24 +87,24 @@ module DiskAudit
       @args = args
       @rdata = rdata
       renderer = ERB.new(template,nil,">")
-      if options.target == '-'
+      if @options.target == '-'
         outFD = STDOUT
       else
-        outFD = File.open(File.join(options.target,REPORTNAME),"w")
+        outFD = File.open(File.join(@options.target,REPORTNAME),"w")
       end
       body = renderer.result(binding)
       mailRenderer = ERB.new(mailTemplate,nil,">")
       mailBody = mailRenderer.result(binding)
       outFD.write(body)
-      if options.target != '-'
+      if @options.target != '-'
         outFD.close()
       end
-      if !options.mailto.nil?
-        mailReport(mailBody,options.mailto)
+      if !@options.mailto.nil?
+        mailReport(mailBody,@options.mailto)
       end
 
       # get logs template
-      if options.format == :html
+      if @options.format == :html
         tempNm = "logreport.html.erb"
       else
         tempNm = "logreport.txt.erb"
@@ -117,14 +118,14 @@ module DiskAudit
       # write log files
       @rdata.each do |tag,data|
         vtag = tag.gsub("/","_")
-        if options.target == '-'
+        if @options.target == '-'
           fd = STDOUT
         else
-          fd = File.open(File.join(options.target,LOGTEMPLATE % [vtag]),"w")
+          fd = File.open(File.join(@options.target,LOGTEMPLATE % [vtag]),"w")
         end
         txt = renderer.result(data.log.getBinding)
         fd.write(txt)
-        if options.target != '-'
+        if @options.target != '-'
           fd.close
         end
       end
@@ -149,7 +150,7 @@ module DiskAudit
       end
     end
 
-    def dump(path,options)
+    def dump(path)
       tag = "#{`hostname`.strip}:#{path}"
       if not File.exist?(path)
         STDERR.write("No such path: '#{path}'...\n")
@@ -160,11 +161,11 @@ module DiskAudit
       Marshal.dump(data,STDOUT)
     end
 
-    def execute_remote(paths,options)
+    def execute_remote(paths)
       data = {}
       paths.each do |arg|
         components = arg.split(":")
-        Net::SSH.start(components[0],options.user) do |ssh|
+        Net::SSH.start(components[0],@options.user) do |ssh|
           raw = ssh.exec!("#{PROGNAME} dump #{components[1]}")
           begin
             data[arg] = Marshal.load(raw)
@@ -180,10 +181,10 @@ module DiskAudit
         v.prepare
         rdata[k] = v
       end
-      generate_report(options,args,rdata)
+      generate_report(args,rdata)
     end
 
-    def execute_local(path,options)
+    def execute_local(path)
       begin
         tag = "#{`hostname`.strip}:#{path}"
         data = AuditData.new(tag,path)
@@ -192,7 +193,7 @@ module DiskAudit
 
         args = [tag]
         rdata = {tag => data}
-        generate_report(options,args,rdata)
+        generate_report(args,rdata)
 
       rescue Errno::ENOENT => noent
         STDERR.puts "Path not found: '#{path}'"

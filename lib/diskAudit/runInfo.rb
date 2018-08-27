@@ -48,10 +48,8 @@ module DiskAudit
     attr_reader :limit
     private
     def setVolumeInfo
-      stdout  = `df -h #{@path}`
+      stdout  = `df -Ph #{@path}` # -P arg to prevent awkward line breaks
       lines = stdout.split("\n")
-      # horrible hack in case df splits a line
-      lines[1] = lines[1] + " " + lines[2] if lines.length == 3
       heads = lines[0].split
       values = lines[1].split
       instance_variable_set("@#{heads[1].downcase}",values[1])

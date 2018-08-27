@@ -24,7 +24,7 @@ begin
     o.banner = "Usage: #{File.basename($0)} [options] dump|remote|local [<path>]"
     o.on("--config FILE","location of the configuration file") {|c| args[:config_file] = c}
     o.on("--destination DIR","target directory for report output") {|t| args[:destination] = t}
-    o.on("-d","--dump","write configuration to stdout") {|d| args[:just_dump] = true}
+    o.on("-d","--defaults","write configuration to stdout") {|d| args[:just_dump] = true}
     o.on("--format FMT",[:text,:html],"format of output (text, html)") {|f| args[:format] = f.to_sym}
     o.on("--level LOGLEVEL","level of logging to perform") {|l| args[:log_level] = l.to_sym}
     o.on("--logfile FILE","log file for system logs") {|l| args[:logfile] = l}
